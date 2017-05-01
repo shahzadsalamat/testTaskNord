@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Nord Software-Participants list</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react-dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+<link href="lop.css" rel="stylesheet" />
+
+
+</head>
+<body>
+
+<div class="container-fluid" id="container"></div>
+
+<script type="text/babel">
+			
+			
+class ButtonGroup extends React.Component {
+  render() {
+    return (
+      <div className="div-buttons">
+        <span>  {this.props.buttons} </span>
+       </div>
+    );
+  }
+}
+
+class EditButton extends React.Component {
+  render() {
+    return (
+ 		<button type="button" onClick={this.props.onClick} className="btn-2" ><span className="glyphicon glyphicon-pencil"></span></button>    );
+  }
+}
+
+class DeleteButton extends React.Component {
+  render() {
+    return (
+		<button type="button" onClick={this.props.onClick} className="btn-2" ><span className="glyphicon glyphicon-trash"></span></button>
+    );
+  }
+}
+
+class ConfirmButton extends React.Component {
+  render() {
+    return (
+      <button type="button" onClick={this.props.onClick} className="btn-1">Save</button>
+    );
+  }
+}
+
+class CancelButton extends React.Component {
+  render() {
+    return (
+      <button type="button" onClick={this.props.onClick} className="btn-2">Cancel</button>
+    );
+  }
+}
+
+class FullWidthButton extends React.Component {
+  render() {
+    return (
+      <button type="button" onClick={this.props.onClick} className="btn btn-default">{this.props.buttontext}</button>
+    );
+  }
+}
+
+
+
+class DisplayField extends React.Component {
+  render() {
+    return (
+      <td width="30%" onClick={this.props.onClick}>{this.props.field.value}</td>
+    );
+  }
+}
+
+class EditField extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: this.props.field.value
+    };
+    this.handleFieldChange = this.handleFieldChange.bind(this);
+  }
+  handleFieldChange(e) {
+    this.setState({
+      value: e.target.value
+    });
+
+    this.props.sendValueToParent(this.props.field.name, e.target.value);
+  }
+  render() {
+    return (
+	
+      <td>
+        <input 
+          className="form-control input-sm"
+          type="text"
+          value={this.state.value}
+          placeholder={this.props.field.placeholder}
+          onChange={this.handleFieldChange}>
+        </input>
+      </td>
+    );
+  }
+}
+
+class TableRow extends React.Component {
+  constructor(props) {
+    super(props);
+    
+    this.handleSelectRow = this.handleSelectRow.bind(this);
+    this.handleEditModeClick = this.handleEditModeClick.bind(this);
+    this.handleExitEditModeClick = this.handleExitEditModeClick.bind(this);
+    this.handleDeleteClick = this.handleDeleteClick.bind(this);
+    this.handleConfirmEditClick = this.handleConfirmEditClick.bind(this);
+    this.updateValues = this.updateValues.bind(this);
+    
+    var editMode = false;
+    var added = false;
+    if (!this.props.instance.date_created) {
+      editMode = true;
+      added = true;
+    }
+    var instance = {};
+    this.props.fielddata.forEach(function(fd) {
+      instance[fd.name] = this.props.instance[fd.name];
+    }, this);
+    instance.id = this.props.instance.id;
+    this.state = {
+      editMode: editMode,
+      instance: instance,
+      revised_instance: instance,
+      deleted: false,
+      added: added,
+      selected: false,
+    };
+  }
+
+  handleSelectRow() {
+    if (!this.state.selected) {
+      this.setState({ selected: true });
+    } else {
+      this.setState({ selected: false });
+    }
+    this.props.setSelectedRow(this.props.instance.id);
+  }
+  
+  handleEditModeClick() {
+    this.setState({ editMode: true });
+  }
+
+  handleExitEditModeClick() {
+    this.setState({ editMode: false });
+    this.setState({
+      revised_instance: this.state.instance
+    });
+    if (this.state.added) {
+      this.setState({deleted: true});
+    }
+  }
+
+  handleDeleteClick() {
+    this.setState({deleted:true});
+  }
+
+  handleConfirmEditClick() {
+    this.setState({
+      editMode: false,
+      instance: this.state.revised_instance
+    });
+    if (this.state.added) {
+      console.log("added");
+      console.log(this.state.revised_instance);
+    }
+    else {
+            this.setState({added:false});
+    }
+  }
+
+  updateValues(key, value) {
+    var temp_revised_instance = this.state.revised_instance;
+    temp_revised_instance[key] = value;
+    this.setState({
+      revised_instance: temp_revised_instance
+    });
+  }
+
+  render() {
+    let row = [];
+    let buttons = null;
+    if (this.state.deleted) {
+      return <tr></tr>;
+    }
+    if (this.state.editMode) {
+      buttons = [<ConfirmButton onClick={this.handleConfirmEditClick}/>, <CancelButton onClick={this.handleExitEditModeClick}/>];
+      this.props.fielddata.forEach(function(fd) {
+        var field = {
+          name : fd.name,
+          placeholder : fd.placeholder,
+          value : this.state.instance[fd.name]
+        };
+        if (fd.inputfield) {
+          row.push(<EditField field={field} key={field.name} sendValueToParent={this.updateValues}/>);
+        } else {
+          row.push(<DisplayField onClick={""} field={""} key={field.name}/>)
+        }
+      }, this);
+    } else {
+      buttons = [<EditButton onClick={this.handleEditModeClick}/>, <DeleteButton onClick={this.handleDeleteClick}/>];
+      this.props.fielddata.forEach(function(fd) {
+        var field = {
+          name: fd.name, 
+          value: this.state.instance[fd.name]
+        };
+        row.push(<DisplayField onClick={this.handleSelectRow} field={field} key={field.value}/>);
+      }, this);
+    }
+    if (this.props.instance.selected) {
+      return (
+        <tr className="success">{row}<ButtonGroup buttons={buttons}/></tr>
+      ); 
+    } else {
+      return (
+        <tr>{row}<ButtonGroup buttons={buttons}/></tr>
+      ); 
+    }
+  }
+
+}
+
+class TableHeader extends React.Component {
+   render() {
+    var tableheaders = [];
+    this.props.fielddata.forEach(function(fd) {
+      tableheaders.push(<th>{fd.header}</th>)
+    });
+    tableheaders.push(<th className="buttoncolumn"></th>);
+    return (
+      <tr>
+        {tableheaders}
+      </tr>
+    );
+  }
+}
+
+class Table extends React.Component {
+  constructor(props) {
+      super(props);
+      this.state = {
+        selected: 0
+      };
+      this.setSelectedRow = this.setSelectedRow.bind(this);
+    }
+  
+  setSelectedRow(id) {
+    this.setState({selected:id});
+    this.props.data.instances.forEach(function(instance) {
+      if (instance.id == id) {
+        this.props.onSelect(instance.childlinks);
+      }
+    }, this);
+  }
+  
+  render() {
+    var rows = [];
+    const fielddata = this.props.data.fielddata;
+    this.props.data.instances.forEach(function(instance) {
+      if (instance.id == this.state.selected) {
+        instance.selected = true;
+      } else {
+        instance.selected = false;
+      }
+      rows.push(<TableRow setSelectedRow={this.setSelectedRow} instance={instance} fielddata={fielddata} key={instance.id} />);
+    }, this);
+	
+	console.log({rows});
+	
+    return (
+	
+      <table id="myTable" width="80%">
+        <thead><TableHeader fielddata={fielddata}/></thead>
+        <tbody>{rows}</tbody> 
+      </table>
+	  
+    );
+  }
+}
+
+
+class TableContainer extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        addMode: false,
+        childlinks: this.props.data.childlinks
+      };
+      this.handleAddClick = this.handleAddClick.bind(this);
+      this.setChildlinks = this.setChildlinks.bind(this);
+      this.getData();
+    }
+  
+    handleAddClick() {
+      this.setState({ addMode: true });
+	 
+    }
+  
+    getData() {
+      console.log("OK");
+    } 
+	
+	setChildlinks(childlinks) {
+      this.setState({childlinks: childlinks});
+     
+      console.log(this.state.childlinks);
+    }
+  
+    render() {
+      if (this.state.addMode) {
+        var instance = {};
+        this.props.data.fielddata.forEach(function(fd) {
+          instance[fd.name] = "";
+		  	  console.log("getting data!");
+
+        });
+        var dataout = this.props.data;
+        dataout.instances.push(instance);
+      }
+      else {
+        dataout = this.props.data;
+      }
+      if (dataout.instances.length > 0) {
+        
+      }
+      return (
+
+        <div className="wrapper" >
+			<div className="div-header">
+				<img className="logo-img" src="logo.png"/>
+			</div>
+	
+            
+			<div className="title">
+				<span><legend>List of participants</legend> 		  	
+					<FullWidthButton buttontext={"Add new Participant"} onClick={this.handleAddClick} /></span>
+
+				 <Table data={dataout} onSelect={this.setChildlinks}/>
+          		  <br/>
+			</div>
+       </div>
+      );
+    }
+  }
+var data = {   
+"api_uri": "http://www.benhoyle.co.uk/attass/oar/cases/data/",
+  "fielddata": [{
+    "header": "Name",
+    "inputfield": true,
+    "length": 10,
+    "name": "name",
+    "placeholder": "Full name"
+  }, {
+    "header": "Email",
+    "inputfield": true,
+    "length": 10,
+    "name": "email",
+    "placeholder": "E-mail address"
+
+  }, {
+    "header": "Phone number",
+    "inputfield": true,
+    "length": 7,
+    "name": "phone no",
+    "placeholder": "Phone number"
+  }],
+  "instances": [{
+    "name": "John Doe",
+    "email": "John.doe@gmail.com",
+    "phone no": "0405678471",
+    "id": 1
+  },  
+    { "name": "george clooney",
+    "email": "george.clooney@hollywood.com",
+    "phone no": "0502846397",
+    "id": 2
+  }, 
+  {
+    "name": "John",
+    "email": "John@yahoo.com",
+    "phone no": "123456782",
+    "id": 3
+  }]
+};
+
+ReactDOM.render(
+  <TableContainer title="List of Participants" data={data}/>,
+  document.getElementById("container")
+);
+    </script>
+
+</body>
+</html>

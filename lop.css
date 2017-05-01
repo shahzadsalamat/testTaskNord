@@ -1,0 +1,130 @@
+@charset "utf-8";
+/* CSS Document */
+
+.btn-1 {
+
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 16px;
+  background: #07f;
+  text-decoration: none;
+  size: 40px;
+}
+
+	.btn:hover {
+ 	 background: #3cb0fd;
+ 	 text-decoration: none;
+ 	 color: #FFFFFF;
+	}
+
+.btn-2 {
+
+  font-family: Arial;
+  color: #0077FF;
+  font-size: 16px;
+  background: #EDEDED;
+  size: 40px;
+
+}
+
+	.btn-2:hover {
+ 	 background: #3cb0fd;
+  	 text-decoration: none;
+  	 color: #FFFFFF;
+}
+
+#myTable{
+    font-family: 'helvetica neue',helvetica,arial,'lucida grande',sans-serif;
+ 	width: 912px;;
+	margin-left:3%;
+	border-collapse: collapse;
+	border-bottom: 1px solid #ddd;
+	color:#505050;
+
+  }
+  #myTable td{
+     padding: 10px;
+     font-size: 12px;
+	 border-bottom: 2px solid #F1F1F1;
+
+	 
+  }
+  #myTable tr{
+     background-color: #FFFFFF;
+     color: #505050;
+	 font-weight:400;
+	 font-size:16px;
+	 border-bottom: 2px solid #F1F1F1;
+
+
+	 
+  }
+  #myTable th{
+     padding: 10px;
+     color: #757575;
+     background-color: #FFFFFF;
+     font-size: 14px;
+	 border-bottom: 2px solid #F1F1F1;
+
+  }
+
+.div-header{
+	height: 96px;
+	width:976px;
+	background-color: #ADB5BD;
+	align-self:center;
+	margin-left:8%;	
+	}
+	
+.logo-img {
+	padding-left:32px;
+	padding-top: 32px;
+	padding-bottom: 32px;
+	inline-size:270px;
+
+    }
+	
+.div-body{
+	min-height: 500px;
+	width:100%;
+	background-color: #F1F1F1;
+	align-content:center;
+	
+	}
+	
+.div-buttons{
+	align-content:center;
+  display: inline-block;
+  width:150px;
+	
+	}
+	
+div.wrapper{
+	background-color:#FFFFFF;
+	
+	}
+	
+div.title{
+	min-height: 400px;
+	width:976px;
+	background-color: #F1F1F1;
+	margin-left:8%;
+	}
+	
+  div.title span{
+	display: inline-block;
+	margin:3%;
+	color:#7E7E7E;
+	
+   }
+  div.title span legend{
+	
+	color:#7E7E7E;
+	font-size:24px;
+	
+  }
+	
+
+	
+	
+	
